@@ -101,7 +101,7 @@ claw:
 	addi $t8, $t8, 20
 	sw $t2, frameBuffer($t8)
 	
-	
+	li $s5, 1 #variable para saber si va a la derecha(1) o a la izquierda(0)
 	li $t1, 1344  #valores para las coordenadas de los pixeles de la garra
 	li $t5, 1600
 	li $t6, 1856
@@ -111,15 +111,16 @@ claw:
 
 	goRight:
 		#pixeles primera fila	
-		bge $t8, $s3, return
+		bge $t8, $s3, return #cuando t8, que esta al tope derecho, llega al limite, va para la izquierda
+		sw $t4, frameBuffer($t1) #pinta de azul el actual ya que se va a mover
+		sub $t1, $t1, 4 #resta para que el anterior tambien se repinte de azul 
 		sw $t4, frameBuffer($t1)
-		sub $t1, $t1, 4
-		sw $t4, frameBuffer($t1)
-		addi $t1, $t1, 8
+		addi $t1, $t1, 8 #suma 8 para posicionarse en la columna nueva para pintar de amarillo
 		sw $t2, frameBuffer($t1)
-		addi $t1, $t1, 4
+		addi $t1, $t1, 4 #y uno mas para la otra columna al lado
 		sw $t2, frameBuffer($t1)
-		sub $t1, $t1, 4
+		sub $t1, $t1, 4 #luego se resta nuevamente para que quede en su posicion nueva izquierda
+		#sucede lo mismo con las otras dos filas
 		#s1 +256, segunda fila
 		sw $t4, frameBuffer($t5)
 		sub $t5, $t5, 4
@@ -138,16 +139,16 @@ claw:
 		addi $t6, $t6, 4
 		sw $t2, frameBuffer($t6)
 		sub $t6, $t6, 4
-		#2108, cuarta fila (separados)
-		sw $t4, frameBuffer($t7)
+		#2108, cuarta fila (cuadros separados)
+		sw $t4, frameBuffer($t7) #se pinta de azul la actual
 		addi $t7, $t7, 4
-		sw $t2, frameBuffer($t7)
-		addi $t7, $t7, 8
+		sw $t2, frameBuffer($t7) #se pinta de amarillo la siguiente 
+		addi $t7, $t7, 8 #suma 8 para quedar en la posicion del cuadro hermano y pintarlo de azul
 		sw $t4, frameBuffer($t7)
-		addi $t7, $t7, 4
+		addi $t7, $t7, 4 #suma 4 mas para pintar amarillo el nuevo cuadro
 		sw $t2, frameBuffer($t7)
-		sub $t7, $t7, 12
-		#2360, quinta fila (separados)
+		sub $t7, $t7, 12 #resta 12 para quedar en la posicion inicial nueva a la izquierda
+		#2360, quinta fila (cuadros separados)
 		sw $t4, frameBuffer($t8)
 		addi $t8, $t8, 4
 		sw $t2, frameBuffer($t8)
@@ -161,6 +162,7 @@ claw:
 		j goRight
 	
 	return:
+		li $s5, 0
 		li $t1, 1472 #se redefinen las ultimas posiciones de la garra para que empiecen justo al borde del limite deseado
 		li $t5, 1728
 		li $t6, 1984
@@ -168,6 +170,7 @@ claw:
 		li $t7, 2244
 		li $t8, 2504
 	goLeft:
+		#cuando va a la izquierda, las funciones de suma y resta se invierten y sea usa la misma logica
 		ble $t8, $s0, claw #cuando llega al tope, reinicia el movimiento de garra desde la izquierda
 		sw $t4, frameBuffer($t1)
 		addi $t1, $t1, 4
@@ -219,13 +222,80 @@ claw:
 		
     	delay: 
         	#a0 es el numero de iteraciones
-        	move $t0, $a0     # contador copiado a $t0
-
+        	move $t0, $a0    # contador copiado a $t0
     		delay_loop:
-        	addi $t0, $t0, -1 
-        	bnez $t0, delay_loop # branch to delay_loop
-        	jr $ra            # Retorna
+        		addi $t0, $t0, -1 
+        		bnez $t0, delay_loop # cuando llega a cero se sale del loop   	
+        	
+        		lw $t9, 0xffff0000  #aca llama la etiqueta del simulador de Keyboard de mips
+        		beq $t9, 1, keyboardListenerIf #y entra a la funcion si es igual a 1, o sea que recibe una tecla
+			j keyboardListenerDone
 	
+		keyboardListenerIf:
+			lw $t9, 0xffff0004 #si el valor de la tecla coincide con el ascii de la barra espaciadora, o sea 32, baja
+			beq $t9, 32, moveDown
+		
+        	keyboardListenerDone:        	    
+        		jr $ra  # Retorna
 	
-end:
+moveDown:
+	li $s4, 8508 #maximo para abajo, que es la posicion y inicial del cuadro mas abajo sumado a 256x25
+
+	moveLoop:
+		bgt $t8, $s4, end #si llega al tope, se detiene
+		beq $s5, $zero, leftDirection #si la garra iba para la izquierda (s5=0)
+		bne $s5, $zero, rightDirection #si la garra iba para la derecha (s5=1)
+		
+		rightDirection:
+		
+		sw $t4, frameBuffer($t8) 
+		addi $t8, $t8, 20
+		sw $t4, frameBuffer($t8)
+		addi $t8, $t8, 256
+		sw $t2, frameBuffer($t8)
+		sub $t8, $t8, 20
+		sw $t2, frameBuffer($t8)
+		#penultimos cuadros
+		sw $t4, frameBuffer($t7) 
+		addi $t7, $t7, 12
+		sw $t4, frameBuffer($t7)
+		addi $t7, $t7, 256
+		sw $t2, frameBuffer($t7)
+		sub $t7, $t7, 12
+		sw $t2, frameBuffer($t7)
+		#barra, esta no se borra para que haga el efecto de que se alarga la garra
+		#solo se repinta la ultima fila ya que de todos modos se va dejando el rastro de las anteriores
+		addi $t6, $t6, 256
+		sw $t2, frameBuffer($t6)
+		addi $t6, $t6, 4
+		sw $t2, frameBuffer($t6)
+		sub $t6, $t6, 4
+
+		j moveLoop
+			
+		leftDirection: #la diferencia con rightDirection es que aca las variables iniciales de la garra estan a la derecha y se les resta para poner su par
+		sw $t4, frameBuffer($t8) 
+		sub $t8, $t8, 20
+		sw $t4, frameBuffer($t8)
+		addi $t8, $t8, 256
+		sw $t2, frameBuffer($t8)
+		addi $t8, $t8, 20
+		sw $t2, frameBuffer($t8)
+		#penultimos cuadros
+		sw $t4, frameBuffer($t7) 
+		sub $t7, $t7, 12
+		sw $t4, frameBuffer($t7)
+		addi $t7, $t7, 256
+		sw $t2, frameBuffer($t7)
+		addi $t7, $t7, 12
+		sw $t2, frameBuffer($t7)
+		#barra, esta no se borra para que haga el efecto de que se alarga la garra
+		addi $t6, $t6, 256
+		sw $t2, frameBuffer($t6)
+		sub $t6, $t6, 4
+		sw $t2, frameBuffer($t6)
+		addi $t6, $t6, 4
+		j moveLoop	
+		
+end: 
 
