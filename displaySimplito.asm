@@ -23,7 +23,7 @@ color:
 	
 
 count:
-	li $t6, 3840     # maximo para pintar, (256x15)
+	li $t6, 3840  # maximo para pintar, (256x15)
 	li $t9, 0        # contador para maximo
 	li $t7, 1232 #para terminar antes de la ultima cuarta parte del ancho 
 	li $t5, 1072     # minimo para iniciar a pintar
@@ -67,7 +67,27 @@ blue:
 		beq   $t9, $t6, reset2  # si el contador llega al limite de abajo, se sale
 
 	j blue # vuelve al llamado
+	
 reset2:
+	li $t1, 0 # iterador de pixeles
+	li $t6, 5940 #inicio primera fila: 256 x 23 + 52
+	li $t5, 10036 # inicio última fila: 256 x 39 + 52
+	lw $t3, colorWhite
+
+Pos:
+	li $v0, 42
+	li $a1, 4095
+	syscall
+	addi $t5, $a0, 5940
+peluches:
+	blt $t1, $t5, noPeluche 
+	sw $t3, frameBuffer($t1)
+	j reset3
+	
+noPeluche:
+	addi  $t1, $t1,     4
+	j peluches
+reset3:
 	li $a0, 10500 #para tiempo entre acciones
 	li $s0, 2380 #coordenadas x iniciales
 	li $s3, 2484 #coordenadas maximas x
@@ -78,6 +98,7 @@ reset2:
 	
 	li $t7, 2108
 	li $t8, 2360 
+	
 		
 claw:
 	#li $t1, 1344 #coordenadas de la garra
@@ -296,5 +317,5 @@ moveDown:
 		sw $t2, frameBuffer($t6)
 		addi $t6, $t6, 4
 		j moveLoop	
-		
+
 end: 
