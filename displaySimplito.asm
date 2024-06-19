@@ -71,22 +71,116 @@ blue:
 reset2:
 	li $t1, 0 # iterador de pixeles
 	li $t6, 5940 #inicio primera fila: 256 x 23 + 52
-	li $t5, 10036 # inicio última fila: 256 x 39 + 52
+	li $t5, 6089 # inicio última fila: 256 x 39 + 52 
+	li $t7, 0 #cantidad de líneas de la montañita que ocupamos
+	li $t8, 0 
 	lw $t3, colorWhite
 
-Pos:
+PosUpper:
 	li $v0, 42
-	li $a1, 4095
+	li $a1, 120
 	syscall
 	addi $t5, $a0, 5940
-peluches:
-	blt $t1, $t5, noPeluche 
+
+cat:
+	blt $t1, $t5, noDraw
 	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 12
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 12
+	addi $t1, $t1, 252
+	sw $t3, frameBuffer($t1)
+	li $t8, 4
+	jal LineForw
+	jal newLine
+	lw $t3, colorGreen
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorWhite
+	li $t8, 2
+	jal LineBac
+	lw $t3, colorGreen
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorWhite
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	lw $t3, colorRed
+	jal newLine
+	li $t8, 3
+	jal LineBac
+	lw $t3, colorWhite
+	addi $t1, $t1, 24
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	jal newLine
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 8
+	li $t8, 5
+	jal LineBac
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	addi $t1, $t1, 12
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	jal newLine
+	subi $t1, $t1, 12
+	jal LineBac
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	addi $t1, $t1, 8
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 4
+	jal newLine
+	li $t8, 6
+	jal LineBac
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	jal newLine
+	li $t8, 5
+	jal LineBac
 	j reset3
 	
-noPeluche:
-	addi  $t1, $t1,     4
-	j peluches
+newLine:
+	addi $t1, $t1, 256
+	sw $t3, frameBuffer($t1)
+	jr $ra
+	
+noDraw:
+	addi $t1, $t1, 4
+	j cat
+	
+LineForw:
+	beq $t7, $t8, backfr
+	addi $t1, $t1, 4 #loop 
+	sw $t3, frameBuffer($t1)
+	addi $t7, $t7, 1
+	j LineForw
+	backfr: 
+		li $t7, 0
+		jr $ra
+	
+LineBac:
+	beq $t7, $t8,back
+	subi $t1, $t1, 4 #loop 
+	sw $t3, frameBuffer($t1)
+	addi $t7, $t7, 1
+	j LineBac
+	back:
+		li $t7, 0
+		jr $ra
+	
+	
+	
 reset3:
 	li $a0, 10500 #para tiempo entre acciones
 	li $s0, 2380 #coordenadas x iniciales
