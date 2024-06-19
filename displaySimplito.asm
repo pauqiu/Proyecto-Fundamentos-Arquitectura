@@ -4,12 +4,14 @@
 
 frameBuffer: .space 1024    # (4× 256)₁ pixeles porque cada uno es de 4 bytes
 colorRed:    .word 0xFF0030   # Rojo
+colorBrown:  .word 0x6c5c41   # Café
 colorGreen:  .word 0x10FF00   # Verde
 colorBlue:   .word 0x4080ff   # Azul
 colorYellow: .word 0xFFFF00   # Amarillo
 colorCyan:   .word 0x00FFFF   # Cian
 colorMagenta:.word 0xFF00FF   # Magenta
 colorWhite: .word 0xFFFFFF
+colorPink:  .word 0xf5a2ca 
 
 
 .text
@@ -75,15 +77,18 @@ reset2:
 	li $t7, 0 #cantidad de líneas de la montañita que ocupamos
 	li $t8, 0 
 	lw $t3, colorWhite
-
-PosUpper:
+	
+Pos:
 	li $v0, 42
-	li $a1, 120
+	li $a1, 100
 	syscall
 	addi $t5, $a0, 5940
 
+noDrawCat:
+	jal go
+
 cat:
-	blt $t1, $t5, noDraw
+	blt $t1, $t5, noDrawCat
 	sw $t3, frameBuffer($t1)
 	addi $t1, $t1, 12
 	sw $t3, frameBuffer($t1)
@@ -93,13 +98,13 @@ cat:
 	li $t8, 4
 	jal LineForw
 	jal newLine
-	lw $t3, colorGreen
+	lw $t3, colorBrown
 	subi $t1, $t1, 4
 	sw $t3, frameBuffer($t1)
 	lw $t3, colorWhite
 	li $t8, 2
 	jal LineBac
-	lw $t3, colorGreen
+	lw $t3, colorBrown
 	subi $t1, $t1, 4
 	sw $t3, frameBuffer($t1)
 	lw $t3, colorWhite
@@ -148,6 +153,74 @@ cat:
 	jal newLine
 	li $t8, 5
 	jal LineBac
+	
+PosSecond:
+	lw $t3, colorPink
+	li $t1, 0 
+	li $v0, 42
+	li $a1, 110
+	syscall
+	addi $t5, $a0, 6964
+
+noDrawKirby:
+	jal go
+
+Kirby:
+	blt $t1, $t5, noDrawKirby
+	sw $t3, frameBuffer($t1)
+	li $t8, 2
+	jal LineForw
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 4
+	jal LineBac
+	subi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorBrown
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorPink
+	li $t8, 2
+	jal LineForw
+	lw $t3, colorBrown
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorPink
+	li $t8, 2
+	jal LineForw
+	jal newLine
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorBrown
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorPink
+	li $t8, 2
+	jal LineBac
+	lw $t3, colorBrown
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorPink
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	li $t8, 7
+	jal newLine
+	jal LineForw
+	jal newLine
+	li $t8, 7
+	jal LineBac
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 5
+	jal LineForw
+	addi $t1, $t1, 4
+	lw $t3, colorRed
+	jal newLine
+	li $t8, 2
+	jal LineBac
+	subi $t1, $t1, 8
+	li $t8, 3
+	jal LineBac
 	j reset3
 	
 newLine:
@@ -155,9 +228,9 @@ newLine:
 	sw $t3, frameBuffer($t1)
 	jr $ra
 	
-noDraw:
+go:
 	addi $t1, $t1, 4
-	j cat
+	jr $ra
 	
 LineForw:
 	beq $t7, $t8, backfr
