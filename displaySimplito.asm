@@ -15,7 +15,12 @@ colorWhite: .word 0xFFFFFF
 colorPink:  .word 0xf5a2ca 
 colorOrange: .word 0xf7931e
 colorGray: .word 0xa9c6e3
-colorBlack: .word 0x000000 
+colorBlue:   .word 0x4080ff   # Azul
+colorYellow: .word 0xFFFF00   # Amarillo
+brightGreen:  .word 0x8FCE00  # Verde
+darkGreen:   .word 0x38761D   # Azul
+black: .word 0x000000  
+
 
 .text
 drawLine:
@@ -23,18 +28,28 @@ drawLine:
 	
 color:
 	lw $t2, colorYellow
-	lw $t3, colorRed  # $t3 ← 0x00RRGGbb red
-	lw $t4, colorBlue # $t4 ← 0x00rrggBB blue
-	
-
-count:
-	li $t6, 3840  # maximo para pintar, (256x15)
+  
+getCoins:
+	lw $s7, 0xffff0000  #aca llama la etiqueta del simulador de Keyboard de mips
+        beq $s7, 1, keyDetected #y entra a la funcion si es igual a 1, o sea que recibe una tecla
+	j waitForNum	
+		keyDetected:
+			lw $s7, 0xffff0004 #si el valor de la tecla coincide con el ascii de la barra espaciadora, o sea 32, baja
+			blt $s7, 49, waitForNum
+			ble $s7, 57, count
+		
+        	waitForNum:        	    
+        		j getCoins  # Retorna
+        		
+count: #reinicializacion de variables
+	li  $t1, 0	
+	li $t6, 3840     # maximo para pintar, (256x15)
 	li $t9, 0        # contador para maximo
-	li $t7, 1232 #para terminar antes de la ultima cuarta parte del ancho 
-	li $t5, 1072     # minimo para iniciar a pintar
-
+	li $t7, 1232 	 #para terminar antes de la ultima cuarta parte del ancho 
+	li $t5, 1072     # minimo para iniciar a pintar  
+	      			
 red:
-
+	lw $t3, colorRed  # $t3 ← 0x00RRGGbb red
 	blt $t1, $t5, noPaint #si no ha llegado al inicio, no pinta
 	bgt $t1, $t7, noPaint #si llega al limite, tampoco pinta
 	sw $t3, frameBuffer($t1)# pintar cuadro
@@ -58,7 +73,8 @@ reset: #redefinen los contadores de nuevo
 	li $t5, 1332# minimo para iniciar a pintar, un ancho mas pequenno para el cuadro interno y una fila abajo (1088+256)
 
 
-blue:
+blue:		
+	lw $t4, colorBlue # $t4 ← 0x00rrggBB blue
 	blt $t1, $t5, noPaintBlue #si no ha llegado al inicio, no pinta
 	bgt $t1, $t7, noPaintBlue #si llega al limite, tampoco pinta
 	sw $t4, frameBuffer($t1)# pintar cuadro
@@ -69,10 +85,10 @@ blue:
 	noPaintBlue:
 		addi  $t1, $t1,     4  # incrementar por 4 para desplazarse en cuadros
 		addi  $t9, $t9,     1  # $t9++
-		beq   $t9, $t6, reset2  # si el contador llega al limite de abajo, se sale
+		beq   $t9, $t6, turtle  # si el contador llega al limite de abajo, se sale
 
 	j blue # vuelve al llamado
-	
+
 reset2:
 	li $t1, 0 # iterador de pixeles
 	li $t6, 5940 #inicio primera fila: 256 x 23 + 52
@@ -346,7 +362,7 @@ Potion:
 	jal newLine
 	li $t8, 2
 	jal LineBac
-	j reset3
+	j turtle
 	
 newLine:
 	addi $t1, $t1, 256
@@ -377,10 +393,109 @@ LineBac:
 		li $t7, 0
 		jr $ra
 	
+turtle:
+	lw $t2, black
+	lw $t3, brightGreen  # $t3 ← 0x00RRGGbb red
+	lw $t4, darkGreen # $t4 ← 0x00rrggBB blue
+
+	li $t6, 8516    
 	
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 248
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 8
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 228
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)	
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t2, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
 	
+	addi $t6, $t6, 224
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)	
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	
+	addi $t6, $t6, 220
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t4, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	
+	addi $t6, $t6, 228
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	
+	addi $t6, $t6, 236
+	sw $t3, frameBuffer($t6)	
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 12
+	sw $t3, frameBuffer($t6)
+	addi $t6, $t6, 4
+	sw $t3, frameBuffer($t6)
+		
 reset3:
-	li $a0, 10500 #para tiempo entre acciones
+	li $a0, 20500 #para tiempo entre acciones
 	li $s0, 2380 #coordenadas x iniciales
 	li $s3, 2484 #coordenadas maximas x
 	
@@ -394,6 +509,8 @@ reset3:
 		
 claw:
 	#li $t1, 1344 #coordenadas de la garra
+	lw $t2, colorYellow
+	lw $t4, colorBlue
 	sw $t2, frameBuffer($t1)
 	addi $t1, $t1, 4
 	sw $t2, frameBuffer($t1)
@@ -552,10 +669,12 @@ claw:
         		jr $ra  # Retorna
 	
 moveDown:
+	#lw $t2, colorYellow
+	#lw $t4, colorBlue
 	li $s4, 8508 #maximo para abajo, que es la posicion y inicial del cuadro mas abajo sumado a 256x25
-
+	li $t0, 200000
 	moveLoop:
-		bgt $t8, $s4, end #si llega al tope, se detiene
+		bgt $t8, $s4, findMatch #si llega al tope, se detiene
 		beq $s5, $zero, leftDirection #si la garra iba para la izquierda (s5=0)
 		bne $s5, $zero, rightDirection #si la garra iba para la derecha (s5=1)
 		
@@ -609,5 +728,117 @@ moveDown:
 		sw $t2, frameBuffer($t6)
 		addi $t6, $t6, 4
 		j moveLoop	
+	
+	findMatch:
+		li $t9, 8004 #copia de posicion de la tortuga, ajustada al maximo de la garra
+		beq $s5, $zero, left #si la garra iba para la izquierda (s5=0)
+		bne $s5, $zero, right #si la garra iba para la derecha (s5=1)
+		left:
+			beq $t9, $t6, winTurtle #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			sub $t6, $t6, 4
+			beq $t9, $t6, winTurtle
+			j delay2 #sino, que siga jugando
+		
+		right:
+			beq $t9, $t6, winTurtle
+			addi $t6, $t6, 4
+			beq $t9, $t6, winTurtle
+			j delay2		
+	winTurtle: #llamado a la victoria
+		j WIN
+	delay2: 			
+        	addi $t0, $t0, -1 
+        	bnez $t0, delay2
+        	     		
+games: 
+	beq $s7, 49, end #como el contador de partidas esta en ASCII, 49=1
+	sub $s7, $s7, 1 #a cada ronda, se le resta uno al contador
+	j count
 
-end: 
+WIN:
+    li $t3,  11096  # posicion inicial de win
+    lw $t2, colorYellow # carga del color
+
+    li $t1, 0    #carga del contador
+   draw_w_row:
+    # dibujar linea vertical
+    drawW1:
+    beq $t1, 7, drawW2
+    addi $t3, $t3, 256   
+    sw $t2, frameBuffer($t3)       
+    addi $t1, $t1, 1
+    j drawW1
+    
+    #dibujar diagonales de W
+    drawW2:
+    li $t1, 0
+    sub $t3, $t3, 252
+    sw $t2, frameBuffer($t3) 
+    sub $t3, $t3, 252
+    sw $t2, frameBuffer($t3) 
+    sub $t3, $t3, 252
+    sw $t2, frameBuffer($t3) 
+    sub $t3, $t3, 256
+    sw $t2, frameBuffer($t3) 
+    
+    addi, $t3, $t3, 516
+    sw $t2, frameBuffer($t3) 
+    addi $t3, $t3, 260
+    sw $t2, frameBuffer($t3) 
+    addi $t3, $t3, 260
+    sw $t2, frameBuffer($t3) 
+    
+    #dibujar linea de W
+    drawW3:
+    beq $t1, 7, draw_i   
+    sw $t2, frameBuffer($t3)    
+    sub $t3, $t3, 256
+    addi $t1, $t1, 1
+    j drawW3
+    
+    #pintar I
+   draw_i:
+    li $t1, 0          
+    addi $t3, $t3, 256
+    addi $t3, $t3,  12
+   draw_i_row:
+    beq $t1, 7, draw_n  
+    sw $t2, frameBuffer($t3)     
+    addi $t3, $t3, 256 
+    addi $t1, $t1, 1    
+    j draw_i_row       
+
+     # pintar "N"
+    draw_n:
+    li $t1, 0       
+    sub $t3, $t3, 244
+    drawN1: 
+    sw $t2, frameBuffer($t3) 
+    sub $t3, $t3, 256 
+    addi $t1, $t1, 1
+    bne $t1, 7, drawN1   
+    jal resetL
+ 
+    drawN2:      
+    addi $t3, $t3, 260
+    sw $t2, frameBuffer($t3)      
+    addi $t1, $t1, 1    
+    bne $t1, 7, drawN2
+    jal resetL          # Loop
+
+    drawN3:
+    beq $t1, 7,endWin
+    sw $t2, frameBuffer($t3) 
+    sub $t3, $t3, 256 
+    addi $t1, $t1, 1
+    j drawN3   
+    
+endWin:
+j delay2
+
+   resetL:
+    li $t1, 0
+    jr $ra
+    
+end:
+
