@@ -6,13 +6,16 @@ frameBuffer: .space 1024    # (4× 256)₁ pixeles porque cada uno es de 4 bytes
 colorRed:    .word 0xFF0030   # Rojo
 colorBrown:  .word 0x6c5c41   # Café
 colorGreen:  .word 0x10FF00   # Verde
+darkerGreen: .word 0x38761d 
 colorBlue:   .word 0x4080ff   # Azul
 colorYellow: .word 0xFFFF00   # Amarillo
 colorCyan:   .word 0x00FFFF   # Cian
 colorMagenta:.word 0xFF00FF   # Magenta
 colorWhite: .word 0xFFFFFF
 colorPink:  .word 0xf5a2ca 
-
+colorOrange: .word 0xf7931e
+colorGray: .word 0xa9c6e3
+colorBlack: .word 0x000000 
 
 .text
 drawLine:
@@ -79,10 +82,7 @@ reset2:
 	lw $t3, colorWhite
 	
 Pos:
-	li $v0, 42
-	li $a1, 100
-	syscall
-	addi $t5, $a0, 5940
+	li $t5, 5950
 
 noDrawCat:
 	jal go
@@ -156,11 +156,8 @@ cat:
 	
 PosSecond:
 	lw $t3, colorPink
-	li $t1, 0 
-	li $v0, 42
-	li $a1, 110
-	syscall
-	addi $t5, $a0, 6964
+	li $t1, 0
+	li $t5, 8115
 
 noDrawKirby:
 	jal go
@@ -220,6 +217,134 @@ Kirby:
 	jal LineBac
 	subi $t1, $t1, 8
 	li $t8, 3
+	jal LineBac
+
+PosThird:
+	lw $t3, colorOrange
+	li $t1, 0 
+	li $t5, 6285
+	
+noDrawAmong:
+	jal go
+
+amongUS:
+	blt $t1, $t5, noDrawAmong
+	sw $t3, frameBuffer($t1)
+	li $t8, 2
+	li $t8, 2
+	jal LineForw
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 4
+	jal LineBac
+	subi $t1, $t1, 4	
+	jal newLine
+	li $t8, 2
+	jal LineForw
+	lw $t3, colorGray
+	li $t8, 3
+	jal LineForw
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 4
+	jal LineBac
+	lw $t3, colorOrange
+	jal LineBac
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	lw $t3, colorGray
+	li $t8, 3
+	jal LineForw
+	lw $t3, colorOrange
+	jal newLine
+	li $t8, 7
+	jal LineBac
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 6
+	jal LineForw
+	jal newLine
+	li $t8, 1
+	jal LineBac
+	subi $t1, $t1, 8
+	li $t8, 2
+	jal LineBac
+	
+PosFourth:
+	lw $t3, colorBrown
+	li $t1, 0 
+	li $t5, 7015
+
+noDrawPotion:
+	jal go
+
+Potion:
+	blt $t1, $t5, noDrawPotion
+	sw $t3, frameBuffer($t1)
+	li $t8, 2
+	jal LineForw
+	addi $t1, $t1, 4
+	lw $t3, colorGray
+	jal newLine
+	li $t8, 4
+	jal LineBac
+	jal newLine
+	lw $t3, colorBrown
+	li $t8, 3
+	jal LineForw
+	lw $t3, colorGray
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorCyan
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorGray
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	jal newLine
+	lw $t3, colorCyan
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorGray
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorCyan
+	li $t8, 3
+	jal LineBac
+	lw $t3, colorGray
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorCyan
+	li $t8, 5
+	jal LineForw
+	lw $t3, colorGray
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	jal newLine
+	lw $t3, colorCyan
+	li $t8, 5
+	jal LineBac
+	lw $t3, colorGray
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorCyan
+	li $t8, 3
+	jal LineForw
+	lw $t3, colorGray
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 4
+	jal newLine
+	li $t8, 2
 	jal LineBac
 	j reset3
 	
