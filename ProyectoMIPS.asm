@@ -96,7 +96,7 @@ reset2:
 	lw $t3, colorWhite
 	
 Pos:
-	li $t5, 5950
+	li $t5, 7225
 
 noDrawCat:
 	jal go
@@ -236,7 +236,7 @@ Kirby:
 PosThird:
 	lw $t3, colorOrange
 	li $t1, 0 
-	li $t5, 6285
+	li $t5, 6300
 	
 noDrawAmong:
 	jal go
@@ -392,11 +392,11 @@ LineBac:
 		jr $ra
 	
 turtle:
-	lw $t2, black
-	lw $t3, brightGreen  # $t3 ← 0x00RRGGbb red
-	lw $t4, darkGreen # $t4 ← 0x00rrggBB blue
+	lw $t2, colorBrown
+	lw $t3, colorGreen  # $t3 ← 0x00RRGGbb red
+	lw $t4, darkerGreen # $t4 ← 0x00rrggBB blue
 
-	li $t6, 8516    
+	li $t6, 8580    
 	
 	sw $t4, frameBuffer($t6)
 	addi $t6, $t6, 4
@@ -670,8 +670,11 @@ moveDown:
 	#lw $t2, colorYellow
 	#lw $t4, colorBlue
 	li $s4, 8508 #maximo para abajo, que es la posicion y inicial del cuadro mas abajo sumado a 256x25
-	li $t0, 200000
+	li $t0, 2000000
+	li $t1, 10000
+	
 	moveLoop:
+		li $s6, 0
 		bgt $t8, $s4, findMatch #si llega al tope, se detiene
 		beq $s5, $zero, leftDirection #si la garra iba para la izquierda (s5=0)
 		bne $s5, $zero, rightDirection #si la garra iba para la derecha (s5=1)
@@ -700,8 +703,10 @@ moveDown:
 		addi $t6, $t6, 4
 		sw $t2, frameBuffer($t6)
 		sub $t6, $t6, 4
-
-		j moveLoop
+		delay3:
+			addi $s6, $s6, 1
+			ble $s6, $t1, delay3
+			j moveLoop
 			
 		leftDirection: #la diferencia con rightDirection es que aca las variables iniciales de la garra estan a la derecha y se les resta para poner su par
 		sw $t4, frameBuffer($t8) 
@@ -725,24 +730,67 @@ moveDown:
 		sub $t6, $t6, 4
 		sw $t2, frameBuffer($t6)
 		addi $t6, $t6, 4
-		j moveLoop	
+		delay4:
+			addi $s6, $s6, 1
+			ble $s6, $t1, delay4
+			j moveLoop
+		#j moveLoop	
 	
 	findMatch:
 		li $t9, 8004 #copia de posicion de la tortuga, ajustada al maximo de la garra
+		li $t7, 8044 #potion
+		
+		li $t5, 8068 #luis
+		
+		li $s3, 8092 
+		
+		li $s2, 8116 #Kirbo
 		beq $s5, $zero, left #si la garra iba para la izquierda (s5=0)
 		bne $s5, $zero, right #si la garra iba para la derecha (s5=1)
 		left:
-			beq $t9, $t6, winTurtle #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			beq $t9, $t6, winPrice #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
 			sub $t6, $t6, 4
-			beq $t9, $t6, winTurtle
+			beq $t9, $t6, winPrice
+			addi $t6, $t6, 4
+			beq $t7, $t6, winPrice #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			sub $t6, $t6, 4
+			beq $t7, $t6, winPrice
+			addi $t6, $t6, 4
+			beq $t5, $t6, winPrice #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			sub $t6, $t6, 4
+			beq $t5, $t6, winPrice
+			addi $t6, $t6, 4
+			beq $s3, $t6, winPrice #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			sub $t6, $t6, 4
+			beq $s3, $t6, winPrice
+			addi $t6, $t6, 4
+			beq $s2, $t6, winPrice #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			sub $t6, $t6, 4
+			beq $s2, $t6, winPrice
 			j delay2 #sino, que siga jugando
 		
 		right:
-			beq $t9, $t6, winTurtle
+			beq $t9, $t6, winPrice
 			addi $t6, $t6, 4
-			beq $t9, $t6, winTurtle
+			beq $t9, $t6, winPrice
+			sub $t6, $t6, 4
+			beq $t7, $t6, winPrice #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			addi $t6, $t6, 4
+			beq $t7, $t6, winPrice
+			sub $t6, $t6, 4
+			beq $t5, $t6, winPrice #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			addi $t6, $t6, 4
+			beq $t5, $t6, winPrice
+			sub $t6, $t6, 4
+			beq $s3, $t6, winPrice #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			addi $t6, $t6, 4
+			beq $s3, $t6, winPrice
+			sub $t6, $t6, 4
+			beq $s2, $t6, winPrice #si la pos final Y de la garra coincide con uno de los dos pixeles Y de la tortuga
+			addi $t6, $t6, 4
+			beq $s2, $t6, winPrice
 			j delay2		
-	winTurtle: #llamado a la victoria
+	winPrice: #llamado a la victoria
 		j WIN
 	delay2: 			
         	addi $t0, $t0, -1 
@@ -839,4 +887,5 @@ j delay2
     jr $ra
     
 end:
-
+	li $v0, 10 #se acaba el juego
+	syscall 
