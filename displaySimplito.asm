@@ -15,8 +15,6 @@ colorWhite: .word 0xFFFFFF
 colorPink:  .word 0xf5a2ca 
 colorOrange: .word 0xf7931e
 colorGray: .word 0xa9c6e3
-colorBlue:   .word 0x4080ff   # Azul
-colorYellow: .word 0xFFFF00   # Amarillo
 brightGreen:  .word 0x8FCE00  # Verde
 darkGreen:   .word 0x38761D   # Azul
 black: .word 0x000000  
@@ -85,7 +83,7 @@ blue:
 	noPaintBlue:
 		addi  $t1, $t1,     4  # incrementar por 4 para desplazarse en cuadros
 		addi  $t9, $t9,     1  # $t9++
-		beq   $t9, $t6, turtle  # si el contador llega al limite de abajo, se sale
+		beq   $t9, $t6, reset2  # si el contador llega al limite de abajo, se sale
 
 	j blue # vuelve al llamado
 
