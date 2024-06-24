@@ -4,11 +4,23 @@
 
 frameBuffer: .space 1024    # (4× 256)₁ pixeles porque cada uno es de 4 bytes
 colorRed:    .word 0xFF0030   # Rojo
+colorBrown:  .word 0x6c5c41   # Café
+colorGreen:  .word 0x10FF00   # Verde
+darkerGreen: .word 0x38761d 
+colorBlue:   .word 0x4080ff   # Azul
+colorYellow: .word 0xFFFF00   # Amarillo
+colorCyan:   .word 0x00FFFF   # Cian
+colorMagenta:.word 0xFF00FF   # Magenta
+colorWhite: .word 0xFFFFFF
+colorPink:  .word 0xf5a2ca 
+colorOrange: .word 0xf7931e
+colorGray: .word 0xa9c6e3
 colorBlue:   .word 0x4080ff   # Azul
 colorYellow: .word 0xFFFF00   # Amarillo
 brightGreen:  .word 0x8FCE00  # Verde
 darkGreen:   .word 0x38761D   # Azul
 black: .word 0x000000  
+
 
 .text
 drawLine:
@@ -16,7 +28,7 @@ drawLine:
 	
 color:
 	lw $t2, colorYellow
-
+  
 getCoins:
 	lw $s7, 0xffff0000  #aca llama la etiqueta del simulador de Keyboard de mips
         beq $s7, 1, keyDetected #y entra a la funcion si es igual a 1, o sea que recibe una tecla
@@ -76,6 +88,310 @@ blue:
 		beq   $t9, $t6, turtle  # si el contador llega al limite de abajo, se sale
 
 	j blue # vuelve al llamado
+
+reset2:
+	li $t1, 0 # iterador de pixeles
+	li $t6, 5940 #inicio primera fila: 256 x 23 + 52
+	li $t5, 6089 # inicio última fila: 256 x 39 + 52 
+	li $t7, 0 #cantidad de líneas de la montañita que ocupamos
+	li $t8, 0 
+	lw $t3, colorWhite
+	
+Pos:
+	li $t5, 5950
+
+noDrawCat:
+	jal go
+
+cat:
+	blt $t1, $t5, noDrawCat
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 12
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 12
+	addi $t1, $t1, 252
+	sw $t3, frameBuffer($t1)
+	li $t8, 4
+	jal LineForw
+	jal newLine
+	lw $t3, colorBrown
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorWhite
+	li $t8, 2
+	jal LineBac
+	lw $t3, colorBrown
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorWhite
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	lw $t3, colorRed
+	jal newLine
+	li $t8, 3
+	jal LineBac
+	lw $t3, colorWhite
+	addi $t1, $t1, 24
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	jal newLine
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 8
+	li $t8, 5
+	jal LineBac
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	addi $t1, $t1, 12
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	jal newLine
+	subi $t1, $t1, 12
+	jal LineBac
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	addi $t1, $t1, 8
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 4
+	jal newLine
+	li $t8, 6
+	jal LineBac
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	jal newLine
+	li $t8, 5
+	jal LineBac
+	
+PosSecond:
+	lw $t3, colorPink
+	li $t1, 0
+	li $t5, 8115
+
+noDrawKirby:
+	jal go
+
+Kirby:
+	blt $t1, $t5, noDrawKirby
+	sw $t3, frameBuffer($t1)
+	li $t8, 2
+	jal LineForw
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 4
+	jal LineBac
+	subi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorBrown
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorPink
+	li $t8, 2
+	jal LineForw
+	lw $t3, colorBrown
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorPink
+	li $t8, 2
+	jal LineForw
+	jal newLine
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorBrown
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorPink
+	li $t8, 2
+	jal LineBac
+	lw $t3, colorBrown
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorPink
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	li $t8, 7
+	jal newLine
+	jal LineForw
+	jal newLine
+	li $t8, 7
+	jal LineBac
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 5
+	jal LineForw
+	addi $t1, $t1, 4
+	lw $t3, colorRed
+	jal newLine
+	li $t8, 2
+	jal LineBac
+	subi $t1, $t1, 8
+	li $t8, 3
+	jal LineBac
+
+PosThird:
+	lw $t3, colorOrange
+	li $t1, 0 
+	li $t5, 6285
+	
+noDrawAmong:
+	jal go
+
+amongUS:
+	blt $t1, $t5, noDrawAmong
+	sw $t3, frameBuffer($t1)
+	li $t8, 2
+	li $t8, 2
+	jal LineForw
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 4
+	jal LineBac
+	subi $t1, $t1, 4	
+	jal newLine
+	li $t8, 2
+	jal LineForw
+	lw $t3, colorGray
+	li $t8, 3
+	jal LineForw
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 4
+	jal LineBac
+	lw $t3, colorOrange
+	jal LineBac
+	jal newLine
+	li $t8, 4
+	jal LineForw
+	lw $t3, colorGray
+	li $t8, 3
+	jal LineForw
+	lw $t3, colorOrange
+	jal newLine
+	li $t8, 7
+	jal LineBac
+	addi $t1, $t1, 4
+	jal newLine
+	li $t8, 6
+	jal LineForw
+	jal newLine
+	li $t8, 1
+	jal LineBac
+	subi $t1, $t1, 8
+	li $t8, 2
+	jal LineBac
+	
+PosFourth:
+	lw $t3, colorBrown
+	li $t1, 0 
+	li $t5, 7015
+
+noDrawPotion:
+	jal go
+
+Potion:
+	blt $t1, $t5, noDrawPotion
+	sw $t3, frameBuffer($t1)
+	li $t8, 2
+	jal LineForw
+	addi $t1, $t1, 4
+	lw $t3, colorGray
+	jal newLine
+	li $t8, 4
+	jal LineBac
+	jal newLine
+	lw $t3, colorBrown
+	li $t8, 3
+	jal LineForw
+	lw $t3, colorGray
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorCyan
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorGray
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	jal newLine
+	lw $t3, colorCyan
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	lw $t3, colorGray
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorCyan
+	li $t8, 3
+	jal LineBac
+	lw $t3, colorGray
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorCyan
+	li $t8, 5
+	jal LineForw
+	lw $t3, colorGray
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	jal newLine
+	lw $t3, colorCyan
+	li $t8, 5
+	jal LineBac
+	lw $t3, colorGray
+	subi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	addi $t1, $t1, 4
+	jal newLine
+	lw $t3, colorCyan
+	li $t8, 3
+	jal LineForw
+	lw $t3, colorGray
+	addi $t1, $t1, 4
+	sw $t3, frameBuffer($t1)
+	subi $t1, $t1, 4
+	jal newLine
+	li $t8, 2
+	jal LineBac
+	j turtle
+	
+newLine:
+	addi $t1, $t1, 256
+	sw $t3, frameBuffer($t1)
+	jr $ra
+	
+go:
+	addi $t1, $t1, 4
+	jr $ra
+	
+LineForw:
+	beq $t7, $t8, backfr
+	addi $t1, $t1, 4 #loop 
+	sw $t3, frameBuffer($t1)
+	addi $t7, $t7, 1
+	j LineForw
+	backfr: 
+		li $t7, 0
+		jr $ra
+	
+LineBac:
+	beq $t7, $t8,back
+	subi $t1, $t1, 4 #loop 
+	sw $t3, frameBuffer($t1)
+	addi $t7, $t7, 1
+	j LineBac
+	back:
+		li $t7, 0
+		jr $ra
 	
 turtle:
 	lw $t2, black
@@ -178,7 +494,7 @@ turtle:
 	addi $t6, $t6, 4
 	sw $t3, frameBuffer($t6)
 		
-reset2:
+reset3:
 	li $a0, 20500 #para tiempo entre acciones
 	li $s0, 2380 #coordenadas x iniciales
 	li $s3, 2484 #coordenadas maximas x
@@ -189,6 +505,7 @@ reset2:
 	
 	li $t7, 2108
 	li $t8, 2360 
+	
 		
 claw:
 	#li $t1, 1344 #coordenadas de la garra
@@ -524,3 +841,4 @@ j delay2
     jr $ra
     
 end:
+
