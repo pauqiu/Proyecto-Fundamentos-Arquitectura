@@ -1,4 +1,4 @@
-# animated-happiness
+# Proyecto-Fundamentos-Arquitectura
 Proyecto Arqui
 
 # Formato de la ventana de bitmap
