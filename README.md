@@ -1,8 +1,9 @@
 # Proyecto Fundamentos de Arquitectura UCR
 Máquina de garra
 
-#Integrantes
+# Integrantes
 Amanda Rodríguez Jiménez C36725 (posho0112)
+
 Paulette Zamora Hernández C38632 (pauqiu)
 
 # Formato de la ventana de bitmap
